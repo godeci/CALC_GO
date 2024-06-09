@@ -128,7 +128,7 @@ func main() {
 
 		operand1, _ = strconv.Atoi(parts[0])
 		operand2, _ = strconv.Atoi(parts[2])
-		if operand1 < 1 || operand1 > 10 || operand2 < 1 && operand2 > 10 {
+		if operand1 < 1 || operand1 > 10 || operand2 < 1 || operand2 > 10 {
 			panic("значение вводимые должны быть от 1 до 10 вкл")
 		}
 		var result = calcInt(operator, operand1, operand2)
