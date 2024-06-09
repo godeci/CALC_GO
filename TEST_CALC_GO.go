@@ -68,14 +68,47 @@ func intToRoman(num int) string {
 
 	return result
 }
+func romanToInt(s string) int {
+	romanMap := map[string]int{
+		"I": 1,
+		"V": 5,
+		"X": 10,
+		"L": 50,
+		"C": 100,
+		"D": 500,
+		"M": 1000,
+	}
+
+	result := 0
+	for i := 0; i < len(s); i++ {
+		current := romanMap[string(s[i])]
+		next := 0
+		if i+1 < len(s) {
+			next = romanMap[string(s[i+1])]
+		}
+
+		if current < next {
+			result -= current
+		} else {
+			result += current
+		}
+	}
+
+	return result
+}
 
 func main() {
 
-	fmt.Print("Введите операцию : ")
+	//fmt.Print("Введите операцию : ")
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(input)
 	parts := strings.Split(input, " ")
+
+	//fmt.Println(parts[0])
+	//fmt.Println(parts[1])
+	//fmt.Println(parts[2])
+	//fmt.Println("=")
 
 	if len(parts) != 3 {
 		panic("Выдача паники, так как формат математической операции не удовлетворяет заданию — два операнда и один оператор (+, -, /, *).")
@@ -85,30 +118,26 @@ func main() {
 
 	var operand1, operand2 int
 
+	if parts[0] == "IIII" || parts[2] == "IIII" {
+		panic("неправильное обозначение цифры 4")
+	}
 	if isArabic(parts[0]) && isRomanNumeral(parts[2]) || isRomanNumeral(parts[0]) && isArabic(parts[2]) {
 		panic("Выдача паники, так как используются одновременно разные системы счисления.")
 	}
 	if isArabic(parts[0]) && isArabic(parts[2]) {
+		if operand1 <= 0 || operand2 <= 0 || operand1 > 10 || operand2 > 10 {
+			panic("значение вводимые должны быть от 1 до 10 вкл")
+		}
 		operand1, _ = strconv.Atoi(parts[0])
 		operand2, _ = strconv.Atoi(parts[2])
 		var result = calcInt(operator, operand1, operand2)
 		fmt.Println(result)
 	}
 	if isRomanNumeral(parts[0]) && isRomanNumeral(parts[2]) { // если оба числа римские приводим к арабским
-		romanToArabic := map[string]int{
-			"I":    1,
-			"II":   2,
-			"III":  3,
-			"IV":   4,
-			"V":    5,
-			"VI":   6,
-			"VII":  7,
-			"VIII": 8,
-			"IX":   9,
-			"X":    10,
-		}
-		operand1 = romanToArabic[parts[0]]
-		operand2 = romanToArabic[parts[2]]
+
+		operand1 = romanToInt(parts[0])
+		operand2 = romanToInt(parts[2])
+
 		var result = calcInt(operator, operand1, operand2)
 		if result <= 0 {
 			panic("Выдача паники, так как в римской системе нет отрицательных чисел.")
