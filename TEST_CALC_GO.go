@@ -90,7 +90,6 @@ func romanToInt(s string) int {
 	return result
 }
 
-// isValidRoman проверяет, является ли строка корректным римским числом.
 func isValidRoman(num string) bool {
 	pattern := regexp.MustCompile(`^M{0,3}(CM|CD|D?C{0,3})?(XC|XL|L?X{0,3})?(IX|IV|V?I{0,3})?$`)
 	return pattern.MatchString(num)
@@ -112,18 +111,15 @@ func main() {
 	if len(parts) != 3 {
 		panic("Выдача паники, так как формат математической операции не удовлетворяет заданию — два операнда и один оператор (+, -, /, *).")
 	}
-	if !isValidRoman(parts[0]) || !isValidRoman(parts[2]) {
-		panic("Некорректное Римское число")
-	}
 
 	operator := parts[1]
 
 	var operand1, operand2 int
 
-	if isArabic(parts[0]) && isValidRoman(parts[2]) || isValidRoman(parts[0]) && isArabic(parts[2]) {
+	if (isArabic(parts[0]) && isValidRoman(parts[2])) || (isValidRoman(parts[0]) && isArabic(parts[2])) {
 		panic("Выдача паники, так как используются одновременно разные системы счисления.")
 	}
-	if isArabic(parts[0]) && isArabic(parts[2]) {
+	if isArabic(parts[0]) && isArabic(parts[2]) && !isValidRoman(parts[0]) && !isValidRoman(parts[2]) {
 
 		operand1, _ = strconv.Atoi(parts[0])
 		operand2, _ = strconv.Atoi(parts[2])
@@ -132,6 +128,9 @@ func main() {
 		}
 		var result = calcInt(operator, operand1, operand2)
 		fmt.Println(result)
+	}
+	if (!isArabic(parts[0]) || !isArabic(parts[2])) && (!isValidRoman(parts[0]) || !isValidRoman(parts[2])) {
+		panic("Некорректное Римское число")
 	}
 	if isValidRoman(parts[0]) && isValidRoman(parts[2]) {
 
