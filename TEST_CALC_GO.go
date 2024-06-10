@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -11,43 +12,6 @@ import (
 func isArabic(s string) bool { // проверка на арбскость
 	_, err := strconv.ParseInt(s, 10, 64)
 	return err == nil
-}
-func isRomanNumeral(roman string) bool {
-	// Создаем карту для сопоставления римских цифр с их числовыми значениями.
-	romanValues := map[rune]int{
-		'I': 1,
-		'V': 5,
-		'X': 10,
-		'L': 50,
-		'C': 100,
-		'D': 500,
-		'M': 1000,
-	}
-
-	// Проверяем, присутствуют ли все символы в строке в карте.
-	for _, r := range roman {
-		if _, ok := romanValues[r]; !ok {
-			return false
-		}
-	}
-
-	// Проверяем, есть ли в строке недопустимые комбинации, например, "IIX"
-	for i := 0; i < len(roman)-1; i++ {
-		current := romanValues[rune(roman[i])]
-		next := romanValues[rune(roman[i+1])]
-
-		// Проверяем, не больше ли предыдущее число, чем последующее.
-		if current < next && i+2 < len(roman) {
-			afterNext := romanValues[rune(roman[i+2])]
-			// Если предыдущее число меньше, чем последующее, но больше, чем число после последующего, то комбинация некорректна
-			if current > afterNext {
-				return false
-			}
-		}
-	}
-
-	// Если все проверки пройдены, то строка является римским числом.
-	return true
 }
 
 func calcInt(operator string, operand1, operand2 int) int {
@@ -126,6 +90,12 @@ func romanToInt(s string) int {
 	return result
 }
 
+// isValidRoman проверяет, является ли строка корректным римским числом.
+func isValidRoman(num string) bool {
+	pattern := regexp.MustCompile(`^M{0,3}(CM|CD|D?C{0,3})?(XC|XL|L?X{0,3})?(IX|IV|V?I{0,3})?$`)
+	return pattern.MatchString(num)
+}
+
 func main() {
 
 	//fmt.Print("Введите операцию : ")
@@ -142,15 +112,15 @@ func main() {
 	if len(parts) != 3 {
 		panic("Выдача паники, так как формат математической операции не удовлетворяет заданию — два операнда и один оператор (+, -, /, *).")
 	}
+	if !isValidRoman(parts[0]) || !isValidRoman(parts[2]) {
+		panic("Некорректное Римское число")
+	}
 
 	operator := parts[1]
 
 	var operand1, operand2 int
 
-	if parts[0] == "IIII" || parts[2] == "IIII" {
-		panic("неправильное обозначение цифры 4")
-	}
-	if isArabic(parts[0]) && isRomanNumeral(parts[2]) || isRomanNumeral(parts[0]) && isArabic(parts[2]) {
+	if isArabic(parts[0]) && isValidRoman(parts[2]) || isValidRoman(parts[0]) && isArabic(parts[2]) {
 		panic("Выдача паники, так как используются одновременно разные системы счисления.")
 	}
 	if isArabic(parts[0]) && isArabic(parts[2]) {
@@ -163,7 +133,7 @@ func main() {
 		var result = calcInt(operator, operand1, operand2)
 		fmt.Println(result)
 	}
-	if isRomanNumeral(parts[0]) && isRomanNumeral(parts[2]) { // если оба числа римские приводим к арабским
+	if isValidRoman(parts[0]) && isValidRoman(parts[2]) {
 
 		operand1 = romanToInt(parts[0])
 		operand2 = romanToInt(parts[2])
